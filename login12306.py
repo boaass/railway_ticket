@@ -27,8 +27,8 @@ class RailwayLoginTool(Singleton):
 
         self.username = username
         self.password = password
-        Logging.debug('<---------- 登录密码:%s ---------->' % self.password.encode('u8'))
         Logging.debug('<---------- 登录用户名:%s ---------->' % self.username.encode('u8'))
+        Logging.debug('<---------- 登录密码:%s ---------->' % self.password.encode('u8'))
 
         res = self.session.get(self.init_url, verify=False)
         if res.status_code == 200:

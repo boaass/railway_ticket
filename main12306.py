@@ -53,7 +53,7 @@ def main():
             buyer_infos.append(all_buyer_infos[int(buyer_index)])
     print buyer_infos
 
-    search = SearchTicket(start=u'北京', to=u'于家堡', dates=[u'2017-09-30'])
+    search = SearchTicket(start=u'北京', to=u'于家堡', trains=[u'C2593'], dates=[u'2017-09-24'])
     flag = 1
     ticket_infos = []
     while flag:

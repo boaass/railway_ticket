@@ -283,7 +283,7 @@ class BuyTicket(object):
             res = self.session.post(confirmSingleForQueueUrl, params=params, verify=False)
             res_text = json.loads(res.text)
             Logging.debug(res_text)
-            if res_text['status'] == 'true' and res_text['httpstatus'] == 200:
+            if res_text['status'] == 'True' and res_text['httpstatus'] == 200:
                 Logging.debug('<---------- 订票成功 ---------->')
                 return True
             else:
