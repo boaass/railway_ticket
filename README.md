@@ -10,7 +10,7 @@
 * Logging.py use to print log
 * user.cfg use to save user account
 
-#Dependencies
+# Dependencies
 
 code use python 2.7
 
