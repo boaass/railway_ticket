@@ -75,44 +75,50 @@ class RailwayLoginTool(Singleton):
 
         login_params = dict(username=self.username, password=self.password, appid=self.passport_appId)
         res = self.session.post(self.passport_login, params=login_params)
-        if res.status_code == 200:
-            Logging.debug('<---------- 登录成功 ---------->')
-            Logging.info(res.text)
-            # Logging.info(requests.utils.dict_from_cookiejar(self.session.cookies))
-
-            user_login_res = self.session.post(self.user_login_url, verify=False, allow_redirects=False)
-            Logging.debug(user_login_res.headers)
-            try:
-                Logging.debug('<---------- 获取登录重定向url ---------->')
-                redirect_login_url = user_login_res.headers['Location']
-                Logging.debug('redirect_login_url: %s' % redirect_login_url)
-                Logging.debug(user_login_res.headers)
-                Logging.debug('<---------- 重定向获取 JSESSIONID ---------->')
-                redirect_res = self.session.get(redirect_login_url, verify=False)
-                Logging.debug(redirect_res.headers)
+        try:
+            if json.loads(res.text)['result_code'] == 0:
+                Logging.debug('<---------- 登录成功 ---------->')
+                Logging.info(res.text)
                 # Logging.info(requests.utils.dict_from_cookiejar(self.session.cookies))
 
-                Logging.debug('<---------- 获取token ---------->')
-                token = self.get_uam()
-                if token is None or len(token) == 0:
-                    return False
-                else:
-                    Logging.debug('<---------- 将token保存进cookies ---------->')
-                    res = self.session.post(self.uamauthclient, params={'tk':token}, verify=False)
-                    res_json = json.loads(res.text)
-                    Logging.debug('<---------- %s ---------->' % res_json['result_message'].encode('u8'))
-                    if res_json['result_code'] != 0:
+                user_login_res = self.session.post(self.user_login_url, verify=False, allow_redirects=False)
+                Logging.debug(user_login_res.headers)
+                try:
+                    Logging.debug('<---------- 获取登录重定向url ---------->')
+                    redirect_login_url = user_login_res.headers['Location']
+                    Logging.debug('redirect_login_url: %s' % redirect_login_url)
+                    Logging.debug(user_login_res.headers)
+                    Logging.debug('<---------- 重定向获取 JSESSIONID ---------->')
+                    redirect_res = self.session.get(redirect_login_url, verify=False)
+                    Logging.debug(redirect_res.headers)
+                    # Logging.info(requests.utils.dict_from_cookiejar(self.session.cookies))
+
+                    Logging.debug('<---------- 获取token ---------->')
+                    token = self.get_uam()
+                    if token is None or len(token) == 0:
                         return False
-                    self.session.cookies.save(ignore_discard=True)
-                    return True
-            except Exception as e:
-                Logging.warning(e)
+                    else:
+                        Logging.debug('<---------- 将token保存进cookies ---------->')
+                        res = self.session.post(self.uamauthclient, params={'tk':token}, verify=False)
+                        res_json = json.loads(res.text)
+                        Logging.debug('<---------- %s ---------->' % res_json['result_message'].encode('u8'))
+                        if res_json['result_code'] != 0:
+                            return False
+                        self.session.cookies.save(ignore_discard=True)
+                        return True
+                except Exception as e:
+                    Logging.warning(e)
+                    return False
+            else:
+                Logging.debug('<---------- 登录失败 ---------->')
+                Logging.debug(res.text)
                 return False
-        else:
-            Logging.debug('<---------- 登录失败 ---------->')
+        except Exception as e:
+            Logging.warning(e)
             return False
 
     def isLogin(self):
+        Logging.debug('<---------- 判断登录状态 ---------->')
         try:
             self.session.cookies.load(ignore_discard=True)
             tk = requests.utils.dict_from_cookiejar(self.session.cookies)['tk']

@@ -14,15 +14,29 @@ def main():
     username = cf.get('login', 'username')
     password = cf.get('login', 'password')
 
-    if len(username) == 0 or len(password) == 0:
-        print 'username or password unable nil'
-        return
-
-    login = RailwayLoginTool(username=username, password=password)
-    isLogin = login.isLogin()
-
+    isLogin = False
     while not isLogin:
+        while len(username) == 0 or len(password) == 0:
+            username = raw_input('Please input username: ')
+            password = raw_input('Please input password: ')
+            continue
+
+        login = RailwayLoginTool(username=username, password=password)
+        isLogin = login.isLogin()
+
+        if isLogin:
+            continue
         isLogin = login.login()
+        if isLogin is False:
+            cf.set('login', 'username', '')
+            cf.set('login', 'password', '')
+            cf.write(open("user.cfg", "w"))
+            username = password = ''
+        else:
+            # cf.add_section('login')
+            cf.set('login', 'username', username)
+            cf.set('login', 'password', password)
+            cf.write(open("user.cfg", "w"))
 
     print '------------------'
     all_buyer_infos = login.get_buyer_list()
